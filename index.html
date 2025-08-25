@@ -1,0 +1,154 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>International Ball — Nominations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"/>
+  <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">IB</div>
+      <div class="brand-text">
+        <h1>International Ball</h1>
+        <p class="tag">Youth Competition</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Guest Login</h3>
+      <form id="guest-login-form" class="stack sm">
+        <input id="guest-name" type="text" placeholder="Your name" required/>
+        <button class="btn primary w100" type="submit">Login as Guest</button>
+      </form>
+      <p class="muted login-state" id="login-state"></p>
+    </div>
+
+    <div class="card">
+      <h3>Recent Votes</h3>
+      <ul id="recent-votes" class="recent-list"></ul>
+      <button class="btn ghost w100" id="clear-votes">Clear Local History</button>
+    </div>
+
+    <div class="card">
+      <a href="#" id="view-rules" class="rules-link">View Rules</a>
+    </div>
+
+    <footer class="footer">
+      <p>ifotac sports inc — All rights reserved</p>
+    </footer>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div class="home-head">
+        <h2>Basketball Nominations</h2>
+        <div class="home-actions">
+          <button class="btn arcade" id="home-login-btn">Login</button>
+        </div>
+      </div>
+      <p class="muted">Vote cooldown: 10 hours per competitor. After you vote, you'll see a countdown.</p>
+    </header>
+
+    <section class="hero">
+      <div class="hero-media">
+        <img src="/Screenshot_20250824_134330_Instagram.png" alt="Maieson profile" class="hero-img"/>
+      </div>
+      <div class="hero-copy">
+        <h3>Featured: Maieson Williams</h3>
+        <p>
+          Nationality: British / American • Born: August 2013 • Age: 12 • Gender: Male
+        </p>
+        <p class="muted">Disciplined at the game.</p>
+        <div class="row gap">
+          <button class="btn primary" data-action="vote-1" data-id="maieson">Vote</button>
+          <button class="btn verify" data-action="vote-9" data-id="maieson">×9 Votes</button>
+          <a class="btn outline" href="profile.html?id=maieson">View Profile</a>
+        </div>
+        <div class="meta">
+          <span>Total Votes: <strong id="votes-maieson">0</strong></span>
+          <span>Place: <strong id="place-maieson">25</strong></span>
+          <span class="cooldown" id="cooldown-maieson"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" id="competitor-grid">
+      <!-- Populated by JS -->
+    </section>
+
+    <section class="category">
+      <div class="category-head">
+        <h2>Peace Sportplayer</h2>
+        <span class="badge">Opens soon</span>
+      </div>
+      <p class="muted">Voting opens August 30, 2025 at 9:00 EST</p>
+      <div class="countdown" id="peace-countdown"></div>
+      <div class="row">
+        <button class="btn disabled" disabled>Voting Locked</button>
+      </div>
+    </section>
+
+    <section class="rules-modal" id="rules-modal" hidden>
+      <div class="modal-card">
+        <button class="close" id="close-rules" aria-label="Close">×</button>
+        <h2>International Ball — Competition Rules</h2>
+        <article class="article">
+          <h3>Integrity</h3>
+          <p>All votes must be cast honestly. Any attempt to manipulate votes or identities may result in disqualification.</p>
+          <h3>Verification</h3>
+          <p>Bulk votes require identity verification. We may request additional proof to confirm eligibility.</p>
+          <h3>Winner Award</h3>
+          <p>The winner receives a professional photoshoot, hotel stay, and a 3000€ prize.</p>
+          <h3>General</h3>
+          <p>By participating you agree to these terms and the decisions of the organizers.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="modal" id="vote-modal" hidden>
+      <div class="modal-card">
+        <button class="close" id="vote-close" aria-label="Close">×</button>
+        <div id="vote-modal-body"><!-- dynamic --></div>
+      </div>
+    </section>
+
+    <section class="modal" id="verify-modal" hidden>
+      <div class="modal-card">
+        <button class="close" id="verify-close" aria-label="Close">×</button>
+        <div id="verify-body">
+          <h3>Verify Identity</h3>
+          <p class="muted">Enter your Instagram username to continue with ×9 votes.</p>
+          <form id="verify-form" class="stack sm">
+            <input id="ig-username" type="text" placeholder="@username" required/>
+            <button class="btn primary" type="submit">Verify</button>
+          </form>
+          <div id="verify-progress" class="progress" hidden>
+            <div class="bar" style="width:0%"></div>
+          </div>
+          <p id="verify-status" class="muted"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="modal" id="confirm-modal" hidden>
+      <div class="modal-card confirm-card" id="confirm-card">
+        <button class="close" id="confirm-close" aria-label="Close">×</button>
+        <div class="confirm-body" id="confirm-body">
+          <!-- Filled by JS with snapshot content -->
+        </div>
+        <div class="row gap">
+          <button class="btn outline" id="share-native">Share</button>
+          <button class="btn primary" id="download-pdf">Download PDF</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
